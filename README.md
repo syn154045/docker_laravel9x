@@ -26,6 +26,28 @@ root/
 └── README. md
 ```
 
+- ※備考：
+    mailpitをDockerfileを用いてビルドするとき、Dockercomposeは以下の通りとなる；
+    ``` docker-compose.yml
+    mailpit:
+        container_name: laravel_FSMTP
+        build:
+            context: .
+            dockerfile: ./docker/mailpit/Dockerfile
+        tty: true
+        ports:
+            - 8025:8025
+            - 1025:1025
+        environment:
+            - MP_DATA_FILE: /home/mailpit/mails
+            - MP_SMTP_SSL_CERT: /keys/cert.pem
+            - MP_SMTP_SSL_KEY: /keys/privkey.pem
+            - MP_SMTP_AUTH_FILE: /keys/.htpasswd
+        volumes:
+            - ./docker/mailpit:/home/mailpit/mails
+            - ./keys:/keys
+    ``` 
+
 
 ## Version manager
 
