@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  app:
+    container_name: ${APP_NAME}
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+      - APP_DOMAIN=localhost
+      - TZ=Asia/Tokyo
+    tty: true
+    ports:
+      - ${APP_PORT:-80}:80
+      - ${APP_SSL_PORT:-443}:443
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+      - mailpit
+  
+  db:
+    container_name: ${DB_NAME}
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=laravel_db
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=test_user
+      - MYSQL_PASSWORD=pwd
+      - TZ=Asia/Tokyo
+    tty: true
+    ports:
+      - ${DB_PORT:-3306}:3306
+    volumes:
+      - ./docker/db/storage:/var/lib/mysql
+      - ./docker/db/server.cnf:/etc/mysql/conf.d/server.cnf
+      - ./docker/db/initdb/:/docker-entrypoint-initdb.d
+  
+  mailpit:
+    container_name: ${MAIL_NAME}
+    image: axllent/mailpit:v1.9
+    environment:
+      - TZ=Asia/Tokyo
+    tty: true
+    ports:
+      - ${MAIL_PORT:-8025}:8025
+      - ${SMTP_PORT:-1025}:1025
+    
+
+volumes:
+  storage:
+

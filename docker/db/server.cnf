@@ -1,0 +1,7 @@
+[mysqld]
+host_cache_size=0
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
+max_allowed_packet=16M
+[client]
+default-character-set=utf8mb4
