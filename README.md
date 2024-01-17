@@ -87,7 +87,7 @@ docker-compose up
 
 4. dockerコンテナ内に入る
 ```bash
-docker exec -it test_react_app bash
+docker exec -it ${APP_NAME} bash
 # .envファイルで設定したAP_NAMEを記入して実行する。
 ```
 
