@@ -83,10 +83,10 @@ php artisan migrate
 9. .env及び.env.exampleの設定変更
 ```env
 APP_NAME=任意の名称
-DB_HOST=docker-composeのdbコンテナ名
-DB_DATABASE=任意の名称
-DB_USERNAME=docker-composeにて設定したユーザー名
-DB_PASSWORD=docker-composeにて設定したパスワード
+DB_HOST=docker-composeのdbコンテナ名(デフォルト：test_db)
+DB_DATABASE=docker-composeのdbコンテナ名(デフォルト：test_db)
+DB_USERNAME=docker-composeにて設定したユーザー名(デフォルト：user)
+DB_PASSWORD=docker-composeにて設定したパスワード(デフォルト：pwd)
 ```
 
 10. app.php編集

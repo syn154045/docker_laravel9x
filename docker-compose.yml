@@ -26,10 +26,10 @@ services:
     container_name: ${DB_NAME}
     image: mysql:8.0
     environment:
-      - MYSQL_DATABASE=laravel_db
+      - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_USER=test_user
-      - MYSQL_PASSWORD=pwd
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
       - TZ=Asia/Tokyo
     tty: true
     ports:
