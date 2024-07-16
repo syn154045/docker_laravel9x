@@ -1,4 +1,4 @@
-# Construction of this Docker Project
+# Docker Container for Laravel9.x
 
 
 ## Directory structure
@@ -8,93 +8,88 @@ root/
 ├── docker/
 │   ├── app/
 │   │   ├── apache2/
-│   │   │   ├──000-default.conf  ...http:port:80用基本設定ファイル
-│   │   │   ├──default-ssl.conf  ...https:port:443用基本設定ファイル
-│   │   │   └──fqdn.conf  ..........ドメイン設定ファイル
-│   │   ├── Dockerfile  ............PHP・Apache・node.js+npmの設定
-│   │   ├── php.ini  ...............PHP設定ファイル
-│   │   └── 000-default.conf  ......Apache設定ファイル
-│   ├── db/  .......................Mysqlデータベース
-│   │   ├── my.conf  ...............Mysql設定ファイル
-│   │   ├── initdb/  ...............Mysql始動時に起動したいSQL格納
-│   │   └── storage/  ..............Mysqlデータ保存用ディレクトリ
-│   └── mailpit/  ..................メールサーバー（FakeSMTP）
-│       └── Dockerfile  ............SSL、認証の設定（ローカル環境では不要）※
-├── src/  ..........................laravelソースディレクトリ（直下に配置すること）
-├── .env  ..........................docker-composeファイルの環境変数
+│   │   │   ├──000-default.conf  ... http:port:80用基本設定ファイル
+│   │   │   ├──default-ssl.conf  ... https:port:443用基本設定ファイル
+│   │   │   └──fqdn.conf  .......... ドメイン設定ファイル
+│   │   ├── Dockerfile  ............. PHP・Apache・node.js+npmの設定
+│   │   ├── php.ini  ................ PHP設定ファイル
+│   │   └── 000-default.conf  ....... Apache設定ファイル
+│   ├── db/  ......................... Mysqlデータベース
+│   │   ├── my.conf  ................ Mysql設定ファイル
+│   │   ├── initdb/  ................ Mysql始動時に起動したいSQL格納
+│   │   └── storage/  ............... Mysqlデータ保存用ディレクトリ
+│   └── mailpit/  .................... メールサーバー（FakeSMTP）
+│       └── Dockerfile  .............. SSL、認証の設定（ローカル環境では不要）※
+├── src/  ............................. laravelソースディレクトリ（直下に配置すること）
+├── .env  ............................. dockerコンテナ環境設定
 ├── docker-compose.yml
 └── README. md
 ```
 
-- ※備考：
-    mailpitをDockerfileを用いてビルドするとき、Dockercomposeは以下の通りとなる；
-    ``` docker-compose.yml
-    mailpit:
-        container_name: laravel_FSMTP
-        build:
-            context: .
-            dockerfile: ./docker/mailpit/Dockerfile
-        tty: true
-        ports:
-            - 8025:8025
-            - 1025:1025
-        environment:
-            - MP_DATA_FILE: /home/mailpit/mails
-            - MP_SMTP_SSL_CERT: /keys/cert.pem
-            - MP_SMTP_SSL_KEY: /keys/privkey.pem
-            - MP_SMTP_AUTH_FILE: /keys/.htpasswd
-        volumes:
-            - ./docker/mailpit:/home/mailpit/mails
-            - ./keys:/keys
-    ``` 
-
 
 ## Version manager
-
 - Docker : 24.0.7
 - Docker-compose : 2.23.3
 - Dockerfile(app) ;
+  - container env ;
+    -  gnupg :                      GNU Privacy Guard、暗号化・署名の為のパッケージ（dockerイメージ構築時に必要）
+    -  npm :                        npm command
+    -  ca-certificates :            これも認証関係
+    -  curl :                       データの送受信
+    -  git :                        Git
+    -  vim :                        Vimエディタ
+    -  zip :                        zip関連ユーティリティ
+    -  unzip :                      zip解凍ユーティリティ
+    -  libzip-dev :                 zipアーカイブの読取・作成・変更する開発ヘッダ
+    -  libfreetype6-dev :           画像処理ライブラリ拡張モジュール；TrueTypeフォントサポート(GD2版)->pngを含むので、libpngは不要
+    -  libjpeg62-turbo-dev :        画像処理ライブラリ拡張モジュール；JPEGサポート(GD2版)
+    -  libpng-dev :                 画像処理ライブラリ拡張モジュール；PNGサポート
+    -  libonig-dev :                Oniguruma正規表現ライブラリ開発ヘッダ
+    -  libssl-dev :                 OpenSSLライブラリ関連ヘッダ
+    -  default-libmysqlclient-dev : MySQL開発ヘッダ
+    -  libmagickwand-dev :          ImageMagick画像編集ライブラリヘッダ
   - PHP : 8.1 - apache2.x
   - nodejs : 20.x
   - npm : 9.5.1
-    - webpack : latest
   - xdebug : 3.2.2
-  - OpenSSL : 3.0.8 *
-  - 
 - Mysql : 8.0
 - mailpit : 1.9
 - Inside the Container ;
   - laravel : 9.x
-  - 
 
 
 ## Installation procedure (Cloning laravel project)
-
-1. .envファイルにコンテナ名を設定
-    -> ~_NAMEの箇所が要変更箇所
-    -> PORT番号は必要に応じて変更すること
-
-2. dockerイメージの生成
+1. git clone
 ```bash
-docker-compose build
-# エラーが発生する場合はうしろに、 "--no-cache" を加えて実行する。
+git clone https://${user_name}:${token}@github.com/${org/user_name}/${this_repository_name}.git .
+# 末尾にドット(.)を付けること
+```
+
+2. .env設定
+```bash
+cp .env.example .env
+# name, portは必要に応じて変更
 ```
 
 3. dockerコンテナ起動
 ```bash
-docker-compose up
+docker-compose up --build
+# エラーが発生する場合はうしろに、 後ろにオプション(--no-cache) を付ける
+# バックグラウンド起動する場合は、後ろにオプション(-d)を付ける
 ```
 
-4. dockerコンテナ内に入る
+4. laravelプロジェクトをクローンする
+```bash
+cd src/
+sudo chmod 777 .
+git clone https://${user_name}:${token}@github.com/${org/user_name}/${repository_name}.git .
+# 末尾にドット(.)を付けること
+```
+
+5. dockerコンテナ内に入る
 ```bash
 docker exec -it ${APP_NAME} bash
 # .envファイルで設定したAP_NAMEを記入して実行する。
-```
-
-5. laravelプロジェクトをクローンする
-```bash
-git clone git@{リポジトリサービス名}:{リポジトリ名}.git
-# clone元からSSHコードをコピーすること
 ```
 
 6. laravelプロジェクトのstorageディレクトリにRWX権限を付与
@@ -102,7 +97,7 @@ git clone git@{リポジトリサービス名}:{リポジトリ名}.git
 chmod -R 777 storage
 ```
 
-7. php artisan初期処理
+7. laravel初期処理
 ```bash
 composer update
 
@@ -115,26 +110,24 @@ php artisan storage:link
 
 # cache生成
 php artisan optimize
-# php artisan view:cache
 
-# ※cache削除するときは；
+# ※cacheを全て削除するときは；
 php artisan optimize:clear
+# ※画面が更新されないときは；
+php artisan route:cache
 
 php artisan migrate
+
+npm i
+# vite 起動
+npm run dev
 ```
 
-8. ルーティング自動反映のためにファイル削除(開発環境のみ)；
-./bootstrap/cache/routes-v7.php
-
-9. vite系(tailwindcss...)の適用について
-ある程度新しいクラスを追加してから、適宜以下にて更新
-```bash
-npm run build
-```
+> ※うまくルーティングができないときは；以下のファイル削除；
+>>./bootstrap/cache/routes-v7.php
 
 
 ## Laravel blade components directory structure
-
 ```script
 ! ".blade.php"は表記省略しています
 
@@ -153,7 +146,7 @@ resources/views/
 │   ├── app-logo   ............アプリケーションロゴ（svg形式）
 │   ├── header   ..............ヘッダー
 │   ├── footer   ..............フッター
-│   └── navigation   ..........ナビゲーションバー（プルダウン形式の場合は不要かもしれない）
+│   └── navigation   ..........ナビゲーションバー
 ├── auth/
 │   ├── register   ............初期登録
 │   ├── login   ...............ログイン
@@ -205,4 +198,3 @@ resources/views/
 孫=components/header
     ->ファイル内容が子に呼び出される
 ```
-
